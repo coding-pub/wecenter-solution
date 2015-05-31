@@ -1,0 +1,113 @@
+<?php TPL::output('global/header.tpl.htm'); ?>
+
+<div class="aw-container-wrap">
+	<div class="container aw-publish">
+		<div class="row">
+			<div class="aw-content-wrap clearfix">
+				<div class="col-sm-12 col-md-9 aw-main-content">
+					<ul class="nav nav-tabs aw-nav-tabs active">
+						<h2 class="hidden-xs"><i class="icon icon-help"></i> <?php _e('参考答案'); ?></h2>
+					</ul>
+					<form action="solution/ajax/<?php if ($this->solution_info['solution_id'] != "") { ?>modify<?php } else { ?>new<?php } ?>_solution/" method="post" id="solution_form" onsubmit="return false;">
+						<input type="hidden" name="post_hash" value="<?php echo new_post_hash(); ?>" />
+						<input type="hidden" name="attach_access_key" value="<?php echo $this->attach_access_key; ?>" />
+						<input type="hidden" name="question_id" id="question_id" value="<?php echo $this->solution_info['question_id']; ?>" />
+
+						<div class="aw-mod aw-mod-publish">
+							<div class="mod-body">
+								<h3><?php _e('问题标题'); ?>:</h3>
+								<!-- 问题标题 -->
+
+								<div>
+									<input type="text" placeholder="<?php _e('问题标题'); ?>..." value="<?php echo $this->solution_info['question_content']; ?>" class="form-control" disabled />
+								</div>
+
+								<!-- end 问题标题 -->
+
+								<h3><?php _e('问题内容'); ?>:</h3>
+								<!-- 问题内容 -->
+
+								<div>
+									<textarea placeholder="<?php _e('问题内容'); ?>..." class="form-control" disabled><?php echo $this->solution_info['question_detail']; ?></textarea>
+								</div>
+
+								<!-- end 问题内容 -->
+
+								<h3><?php _e('参考答案'); ?>:</h3>
+								<div class="aw-mod aw-editor-box">
+									<div class="mod-head">
+										<div class="wmd-panel">
+								            <textarea class="wmd-input form-control autosize editor" id="wmd-input" rows="15" name="solution_content"><?php echo $this->solution_info['solution_content']; ?></textarea>
+								        </div>
+									</div>
+									<div class="mod-body">
+										<span class="pull-right text-color-999" id="question_detail_message">&nbsp;</span>
+										<?php if (get_setting('upload_enable') == 'Y') { ?>
+										<div class="aw-upload-box">
+											<a class="btn btn-default">上传附件</a>
+											<div class="upload-container"></div>
+											<span class="text-color-999 aw-upload-tips hidden-xs"><?php _e('允许'); ?> : <?php echo get_setting('allowed_upload_types'); ?></span>
+										</div>
+										<?php } ?>
+									</div>
+								</div>
+								<?php if ($this->human_valid) { ?>
+								<div class="aw-auth-img clearfix">
+									<input class="form-control pull-right" type="text" name="seccode_verify" placeholder="验证码" />
+									<em class="auth-img pull-right"><img src="" onclick="this.src = G_BASE_URL + '/account/captcha/' + Math.floor(Math.random() * 10000);" id="captcha"  /></em>
+								</div>
+								<?php } ?>
+
+								<h3><?php _e('答案积分'); ?>:</h3>
+								<!-- 问题标题 -->
+
+								<div>
+									<input type="text" placeholder="<?php _e('消耗积分'); ?>..." name="solution_view_cost" id="solution_view_cost" value="<?php echo $this->solution_info['view_cost']; ?>" class="form-control" />
+									<span class="text-color-999 aw-upload-tips hidden-xs">查看答案所需要消耗的积分，请输入0-200之间的积分值</span>
+								</div>
+
+								<!-- end 问题标题 -->
+							</div>
+
+							<div class="mod-footer clearfix">
+								<?php if (get_setting('integral_system_enabled') == 'Y') { ?><a href="integral/rule/" target="_blank">[<?php _e('积分规则'); ?>]</a><?php } ?>
+								<span class="aw-anonymity">
+									<?php if ($this->solution_info['solution_id'] AND ($this->user_info['permission']['is_administortar'] OR $this->user_info['permission']['is_moderator'])) { ?>
+									<label><input type="checkbox" class="pull-left" value="1" name="do_delete" />
+										<?php _e('删除答案'); ?></label>
+									<?php } ?>
+								</span>
+								<a class="btn btn-large btn-success btn-publish-submit" id="solution_submit" onclick="AWS.ajax_post($('#solution_form')); return false;"><?php _e('提交答案'); ?></a>
+							</div>
+						</div>
+					</form>
+				</div>
+				<!-- 侧边栏 -->
+				<div class="col-sm-12 col-md-3 aw-side-bar hidden-xs">
+					<!-- 问题发起指南 -->
+					<div class="aw-mod publish-help">
+						<div class="mod-head">
+							<h3><?php _e('参考答案积分指南'); ?></h3>
+						</div>
+						<div class="mod-body">
+							<p><b>• <?php _e('问题标题'); ?>:</b> <?php _e('请用准确的语言描述您发布的问题思想'); ?></p>
+							<p><b>• <?php _e('问题补充'); ?>:</b> <?php _e('详细补充您的问题内容, 并提供一些相关的素材以供参与者更多的了解您所要问题的主题思想'); ?></p>
+							<p><b>• <?php _e('选择话题'); ?>:</b> <?php _e('选择一个或者多个合适的话题, 让您发布的问题得到更多有相同兴趣的人参与. 所有人可以在您发布问题之后添加和编辑该问题所属的话题'); ?></p>
+							<?php if (get_setting('integral_system_enabled') == 'Y') { ?>
+							<p><b>• <?php _e('关于积分'); ?>：</b> <?php _e('发起一个问题会消耗您 %s 个积分', -get_setting('integral_system_config_new_question')); ?>, <?php if (get_setting('integral_system_config_answer_change_source') == 'Y') { _e('每多一个回复你将获得 %s 个积分的奖励', -get_setting('integral_system_config_new_answer')); ?> ,<?php } _e('为了您的利益, 在发起问题的时候希望能够更好的描述您的问题以及多使用站内搜索功能'); ?>.</p>
+							<?php } ?>
+						</div>
+					</div>
+					<!-- end 问题发起指南 -->
+				</div>
+				<!-- end 侧边栏 -->
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	var ATTACH_ACCESS_KEY = '<?php echo $this->attach_access_key; ?>';
+</script>
+
+<?php TPL::output('global/footer.tpl.htm'); ?>

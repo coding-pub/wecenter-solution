@@ -1,0 +1,30 @@
+<?php TPL::output('m/header.tpl.htm'); ?>
+
+<?php if ($this->redirect_message) { ?>
+<?php foreach ($this->redirect_message AS $key => $message) { ?>
+	<div class="alert alert-warning"><?php echo $message; ?></div>
+<?php } ?>
+<?php } ?>
+
+	<!-- 返回问题 -->
+	<div class="aw-title">
+		<a class="icon icon-inverse" href="m/question/<?php echo $this->solution_info['question_id'];?>" >
+			<i class="icon icon-left"></i>
+			返回问题
+		</a>
+	</div>
+	<!-- 返回问题 -->
+
+	<!-- 答案详细内容 -->
+	<div class="container active">
+		<?php if(!$this->user_id) { ?>
+			<p align="center" style="padding: 15px 0" ><?php _e('要回复问题请先<a href="account/login/">登录</a>或<a href="account/register/">注册</a>'); ?></p>
+		<?php } else if(!$this->user_solution['enough_integral']) { ?>
+			<p align="center" style="padding: 15px 0" ><?php _e('您的积分不足以查看该答案'); ?></p>
+		<?php } else { ?>
+			<p><?php echo $this->solution_info['solution_content']; ?></p>
+		<?php } ?>
+	</div>
+	<!-- end  答案详细内容 -->
+
+<?php TPL::output('m/footer.tpl.htm'); ?>

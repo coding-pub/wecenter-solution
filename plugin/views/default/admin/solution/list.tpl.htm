@@ -1,0 +1,176 @@
+<?php TPL::output('admin/global/header.tpl.htm'); ?>
+<?php TPL::output('admin/global/nav_menu.tpl.htm'); ?>
+
+<div class="aw-content-wrap">
+    <div class="mod">
+        <div class="mod-head">
+            <h3>
+                <ul class="nav nav-tabs">
+                    <li class="active"><a href="#list" data-toggle="tab"><?php _e('参考答案'); ?></a></li>
+                    <li><a href="#search" data-toggle="tab"><?php _e('搜索'); ?></a></li>
+                </ul>
+            </h3>
+        </div>
+
+        <div class="mod-body tab-content">
+            <div class="tab-pane active" id="list">
+                <?php if ($_GET['action'] == 'search') { ?>
+                <div class="alert alert-info"><?php _e('找到 %s 条符合条件的内容', intval($this->solutions_count)); ?></div>
+                <?php } ?>
+
+                <div class="table-responsive">
+                <form id="batchs_form" action="admin/ajax/solution_manage/" method="post">
+                    <input type="hidden" id="action" name="action" value="" />
+                    <input type="hidden" id="parent_id" name="parent_id" value="" />
+                <?php if ($this->list) { ?>
+
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th><input type="checkbox" class="check-all"></th>
+                                <th><?php _e('问题标题'); ?></th>
+                                <th><?php _e('状态'); ?></th>
+                                <th><?php _e('所属用户'); ?></th>
+                                <th><?php _e('最后编辑时间'); ?></th>
+                                <th><?php _e('答案'); ?></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach ($this->list AS $solution_info) { ?>
+                            <tr>
+                                <td><input type="checkbox" name="solution_ids[]" value="<?php echo $solution_info['solution_id']; ?>"></td>
+
+                                <td><a href="question/<?php echo $solution_info['question_id']; ?>" target="_blank"><?php echo $this->questions_info[$solution_info['question_id']]['question_content']; ?></a></td>
+
+                                <td>
+                                    <?php if ($solution_info['status']) { ?>
+                                    <a onclick="AWS.ajax_request(G_BASE_URL + '/admin/ajax/approve_solution/', 'solution_id=<?php echo $solution_info['solution_id']; ?>&status=1');" title="<?php _e('隐藏答案'); ?>" data-toggle="tooltip" class="icon icon-verify md-tip"></a>
+                                    <?php } else { ?>
+                                    <a href="javascript:;" onclick="AWS.ajax_request(G_BASE_URL + '/admin/ajax/approve_solution/', 'solution_id=<?php echo $solution_info['solution_id']; ?>&status=0');" data-toggle="tooltip" title="<?php _e('发表答案'); ?>" class="icon icon-forbid md-tip"></a>
+                                    <?php } ?>
+                                </td>
+
+                                <td><a href="people/<?php echo $this->users_info[$solution_info['published_uid']]['url_token']; ?>" target="_blank"><?php echo $this->users_info[$solution_info['published_uid']]['user_name'] ?></a></td>
+
+                                <td><?php echo date_friendly($solution_info['update_time']); ?></td>
+
+                                <td><a href="solution/<?php echo $solution_info['question_id']; ?>" class="icon icon-edit md-tip" title="<?php _e('编辑'); ?>" data-toggle="tooltip" target="_blank"></a></td>
+                            </tr>
+                            <?php } ?>
+                        </tbody>
+                    </table>
+                <?php } ?>
+                </form>
+                </div>
+
+                <div class="mod-table-foot">
+                    <?php echo $this->pagination; ?>
+
+                    <a class="btn btn-danger" onclick="$('#action').val('remove'); AWS.ajax_post($('#batchs_form'));"><?php _e('删除答案'); ?></a>
+                    <a class="btn btn-primary" onclick="$('#action').val('show'); AWS.ajax_post($('#batchs_form'));"><?php _e('发表答案'); ?></a>
+                    <a class="btn btn-primary" onclick="$('#action').val('hide'); AWS.ajax_post($('#batchs_form'));"><?php _e('隐藏答案'); ?></a>
+                </div>
+            </div>
+
+            <div class="tab-pane" id="search">
+                <form method="post" action="admin/solution/list/" onsubmit="return false;" id="search_form" class="form-horizontal" role="form">
+
+                    <input name="action" type="hidden" value="search" />
+
+                    <div class="form-group">
+                        <label class="col-sm-2 col-xs-3 control-label"><?php _e('关键词'); ?>:</label>
+
+                        <div class="col-sm-5 col-xs-8">
+                            <input class="form-control" type="text" value="<?php echo rawurldecode($_GET['keyword']); ?>" name="keyword" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 col-xs-3 control-label"><?php _e('添加时间范围'); ?>:</label>
+
+                        <div class="col-sm-6 col-xs-9">
+                            <div class="row">
+                                <div class="col-xs-11  col-sm-5 mod-double">
+                                    <input type="text" class="form-control mod-data" value="<?php echo base64_decode($_GET['start_date']); ?>" name="start_date" />
+                                    <i class="icon icon-date"></i>
+                                </div>
+                                <span class="mod-symbol col-xs-1 col-sm-1">
+                                -
+                                </span>
+                                <div class="col-xs-11 col-sm-5">
+                                    <input type="text" class="form-control mod-data" value="<?php echo base64_decode($_GET['end_date']); ?>" name="end_date" />
+                                    <i class="icon icon-date"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 col-xs-3 control-label"><?php _e('作者'); ?>:</label>
+
+                        <div class="col-sm-5 col-xs-8">
+                            <input class="form-control" type="text" value="<?php echo $_GET['user_name']; ?>" name="user_name" />
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 col-xs-3 control-label"><?php _e('状态'); ?>:</label>
+
+                        <div class="col-sm-6 col-xs-9">
+                            <div class="row">
+                                <div class="col-xs-11  col-sm-5 mod-double">
+                                    <input type="text" class="form-control md-tip" name="solution_status" value="<?php echo $_GET['solution_status']; ?>" data-toggle="tooltip" title="<?php _e('0 表示待审核，1 表示已发布'); ?>" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-5 col-xs-8">
+                            <button type="button" onclick="AWS.ajax_post($('#search_form'));" class="btn btn-primary"><?php _e('搜索'); ?></button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function(){
+
+        var json = '';
+
+        $.each($('#target-category option').toArray(), function (i, e)
+        {
+            if (i >= 1)
+            {
+                json += ',';
+            }
+
+            json += "{'title':'" + $(e).text() + "', 'id':'" + $(e).val() + "'}";
+        });
+
+        $('#batchs_post').click(function()
+        {
+            if($('.icheckbox_square-blue').hasClass("checked")){
+                AWS.dialog('adminCategoryMove', {'option':eval('[' + json + ']'), 'name':'选择根话题','from_id':'#batchs_form'});
+
+                $('#parent_id').val($("#aw-ajax-box .form-control:eq(1)").val());
+                $('#action').val('set_parent_id');
+            }else{
+                AWS.alert('请勾选话题');
+            }
+
+        });
+
+        $("#aw-ajax-box").delegate('.form-control:eq(1)','change',function() {
+
+            $('#parent_id').val($("#aw-ajax-box .form-control:eq(1)").val());
+        });
+
+    })
+</script>
+
+<?php TPL::output('admin/global/footer.tpl.htm'); ?>

@@ -1,0 +1,47 @@
+<?php TPL::output('global/header.tpl.htm'); ?>
+
+<div class="aw-container-wrap">
+	<div class="container">
+		<div class="row">
+			<div class="aw-content-wrap clearfix">
+				<div class="col-sm-12 col-md-9 aw-main-content">
+					<div class="aw-mod clearfix">
+						<div class="mod-head common-head clearfix">
+							<h2>
+								<span class="pull-right hidden-xs">
+									<a class="text-color-999" href="question/<?php echo $this->solution_info['question_id'] ?>"><i class="icon icon-left"></i> <?php _e('返回问题'); ?></a>
+								</span>
+
+								<?php _e('参考答案'); ?>
+							</h2>
+						</div>
+						<div class="mod-body aw-question-detail">
+							<div class="content markitup-box">
+								<?php if(!$this->user_id) { ?>
+									<p align="center" style="padding: 15px 0" ><?php _e('要回复问题请先<a href="account/login/">登录</a>或<a href="account/register/">注册</a>'); ?></p>
+								<?php } else if(!$this->user_solution['enough_integral']) { ?>
+									<p align="center" style="padding: 15px 0" ><?php _e('您的积分不足以查看该答案！您可以通过<a href="integral/rule/">积分规则</a>来获取更多积分……'); ?></p>
+								<?php } else { ?>
+									<?php echo $this->solution_info['solution_content']; ?>
+								<?php } ?>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- 侧边栏 -->
+				<div class="col-md-3 aw-side-bar hidden-xs hidden-sm">
+					<?php TPL::output('block/sidebar_menu.tpl.htm'); ?>
+				</div>
+				<!-- end 侧边栏 -->
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	$(document).ready(function () {
+		AWS.load_list_view(G_BASE_URL + '/notifications/ajax/list/', $('#notifications_more'), $('#notifications_list'));
+	});
+</script>
+
+<?php TPL::output('global/footer.tpl.htm'); ?>
